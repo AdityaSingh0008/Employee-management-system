@@ -125,108 +125,120 @@ const Employee=require("../model/employeeSchema");
 
 // GET ALL EMPLOYEES
 
-const getAllEmployees =async (req, res) => {
-  const employees= await Employee.find();
-  res.status(200).json(employees);
-
+const getAllEmployees = async (req, res) => {
+  try {
+    const employees = await Employee.find();
+    res.status(200).json(employees);
+  } catch (error) {
+    console.error("Error in getAllEmployees:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
 };
 
 
 // GET SINGLE EMPLOYEE
 
-const getEmployeeById =async (req, res) => {
+const getEmployeeById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const employee = await Employee.findById(id);
 
-  const id = req.params.id;
+    if (!employee) {
+      return res.status(404).json({
+        message: "Employee Not Found"
+      });
+    }
 
-  const employee = await Employee.findById(id);
-
-  if (!employee) {
-    return res.status(404).json({
-      message: "Employee Not Found"
-    });
+    res.status(200).json(employee);
+  } catch (error) {
+    console.error("Error in getEmployeeById:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
-
-  res.status(200).json(employee);
-
 };
 
 
 // ADD EMPLOYEE
 
 
-const addEmployee =async (req, res) => {
+const addEmployee = async (req, res) => {
+  try {
+    const { name, department, salary } = req.body;
 
-  const { name, department, salary } = req.body;
+    const newEmployee = new Employee({
+      name,
+      department,
+      salary
+    });
 
-  const newEmployee = await new Employee({
-    name,
-    department,
-    salary
-  })
+    await newEmployee.save();
 
-  await newEmployee.save()
-
-  res.status(201).json({
-    message: "Employee Added Successfully",
-    employee: newEmployee
-  });
-
+    res.status(201).json({
+      message: "Employee Added Successfully",
+      employee: newEmployee
+    });
+  } catch (error) {
+    console.error("Error in addEmployee:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
 };
 
 
 // UPDATE EMPLOYEE
 
 const updateEmployee = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const employee = await Employee.findById(id);
 
-  const id = req.params.id;
+    if (!employee) {
+      return res.status(404).json({
+        message: "Employee Not Found"
+      });
+    }
 
-  const employee = await Employee.findById(id);
+    employee.name =
+      req.body.name || employee.name;
 
+    employee.department =
+      req.body.department || employee.department;
 
-  if (!employee) {
-    return res.status(404).json({
-      message: "Employee Not Found"
+    employee.salary =
+      req.body.salary || employee.salary;
+
+    await employee.save();
+
+    res.status(200).json({
+      message: "Employee Updated Successfully",
+      employee
     });
+  } catch (error) {
+    console.error("Error in updateEmployee:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
-
-  employee.name =
-    req.body.name || employee.name;
-
-  employee.department =
-    req.body.department || employee.department;
-
-  employee.salary =
-    req.body.salary || employee.salary;
-
-  await employee.save();
-
-  res.status(200).json({
-    message: "Employee Updated Successfully",
-    employee
-  });
-
 };
 
 
 // DELETE EMPLOYEE
 
-const deleteEmployee = async(req, res) => {
+const deleteEmployee = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const employee = await Employee.findById(id);
 
-  const id = req.params.id;
+    if (!employee) {
+      return res.status(404).json({
+        message: "Employee Not Found"
+      });
+    }
 
-  const index = await Employee.findById(id);
-
-  if (index === -1) {
-    return res.status(404).json({
-      message: "Employee Not Found"
+    await Employee.findByIdAndDelete(id);
+    res.status(200).json({
+      message: "Employee Deleted Successfully"
     });
+  } catch (error) {
+    console.error("Error in deleteEmployee:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
-
-  await Employee.findByIdAndDelete(id);
-  res.status(200).json({
-    message: "Employee Deleted Successfully"
-  });
-
 };
 
 

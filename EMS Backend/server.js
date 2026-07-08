@@ -20,7 +20,8 @@ app.use(express.json());
 app.use(loggerMiddleware);
 
 
-mongoose.connect(process.env.MONGO_URI)
+const dbURI = process.env.MONGO_URI || "mongodb+srv://adityashekhwat25_db_user:vSZpisMCFfWLnIjo@cluster0.ibrva0u.mongodb.net/";
+mongoose.connect(dbURI)
 .then(()=>{
   console.log("Connected to MongoDB");
 })
