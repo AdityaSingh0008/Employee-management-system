@@ -19,9 +19,19 @@ function App() {
 
   // Fetch Employees
   const getEmployees = async () => {
-    const response = await fetch(API_URL);
-    const data = await response.json();
-    setEmployees(data);
+    try {
+      const response = await fetch(API_URL);
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setEmployees(data);
+      } else {
+        console.error("API did not return an array:", data);
+        setEmployees([]);
+      }
+    } catch (err) {
+      console.error("Error fetching employees:", err);
+      setEmployees([]);
+    }
   };
 
   useEffect(() => {
