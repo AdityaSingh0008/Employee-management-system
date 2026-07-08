@@ -14,7 +14,8 @@ function App() {
 
   const [editingId, setEditingId] = useState(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5100/employees";
+  const baseApiUrl = import.meta.env.VITE_API_URL || "http://localhost:5100/employees";
+  const API_URL = baseApiUrl.endsWith("/employees") ? baseApiUrl : `${baseApiUrl}/employees`;
 
   // Fetch Employees
   const getEmployees = async () => {
